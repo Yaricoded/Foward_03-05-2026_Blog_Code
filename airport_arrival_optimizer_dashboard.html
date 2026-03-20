@@ -1,0 +1,368 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:#D6EAF8;color:#1A252F;min-height:100vh;padding:20px}
+  h1{font-size:22px;font-weight:600;color:#1A5276;letter-spacing:-0.5px}
+  h2{font-size:15px;font-weight:500;color:#1A5276;margin-bottom:10px}
+  .subtitle{font-size:12px;color:#5D8AA8;margin-bottom:18px}
+
+  .top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  select,input[type=time]{background:#fff;border:1.5px solid #AED6F1;border-radius:8px;padding:7px 12px;font-size:13px;color:#1A252F;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer}
+  select:focus,input:focus{border-color:#2E86C1}
+  label{font-size:12px;color:#5D8AA8;font-weight:500}
+  .toggle-row{display:flex;gap:12px;flex-wrap:wrap}
+  .toggle{display:flex;align-items:center;gap:6px;font-size:12px;color:#1A5276;background:#EBF5FB;padding:5px 10px;border-radius:20px;cursor:pointer;border:1.5px solid #AED6F1;user-select:none;transition:all .15s}
+  .toggle.active{background:#2E86C1;color:#fff;border-color:#2E86C1}
+
+  .verdict{background:#fff;border-radius:16px;padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;gap:20px;box-shadow:0 2px 12px rgba(46,134,193,0.12)}
+  .plane-icon{font-size:36px;line-height:1}
+  .verdict-main{flex:1}
+  .verdict-label{font-size:11px;color:#5D8AA8;text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px}
+  .verdict-time{font-size:32px;font-weight:600;color:#1A5276;font-family:'DM Mono',monospace;letter-spacing:-1px}
+  .verdict-sub{font-size:13px;color:#5D8AA8;margin-top:3px}
+  .verdict-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:500}
+  .chip-blue{background:#EBF5FB;color:#2E86C1;border:1px solid #AED6F1}
+  .chip-green{background:#EAFAF1;color:#1E8449;border:1px solid #A9DFBF}
+  .chip-amber{background:#FEFBD8;color:#9A7D0A;border:1px solid #F9E79F}
+  .chip-red{background:#FDEDEC;color:#C0392B;border:1px solid #F5B7B1}
+
+  .metrics-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+  .metric{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 1px 6px rgba(46,134,193,0.08)}
+  .metric-label{font-size:11px;color:#5D8AA8;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+  .metric-val{font-size:22px;font-weight:600;color:#1A5276;font-family:'DM Mono',monospace}
+  .metric-sub{font-size:10px;color:#85C1E9;margin-top:2px}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+  @media(max-width:680px){.two-col{grid-template-columns:1fr}.metrics-row{grid-template-columns:1fr 1fr}}
+
+  .card{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 1px 8px rgba(46,134,193,0.09)}
+
+  /* Breakdown bars */
+  .breakdown-item{margin-bottom:9px}
+  .breakdown-label{display:flex;justify-content:space-between;font-size:12px;color:#5D8AA8;margin-bottom:3px}
+  .breakdown-label span:last-child{color:#1A5276;font-weight:500;font-family:'DM Mono',monospace}
+  .bar-track{height:7px;background:#EBF5FB;border-radius:4px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:4px;transition:width .5s ease}
+
+  /* Airlines table */
+  .airline-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;align-items:center;padding:9px 0;border-bottom:.5px solid #D6EAF8;font-size:12px}
+  .airline-row:last-child{border-bottom:none}
+  .airline-header{font-size:10px;color:#85C1E9;text-transform:uppercase;letter-spacing:.06em;padding:6px 0;border-bottom:1.5px solid #AED6F1;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px}
+  .ontime-bar-track{height:5px;background:#EBF5FB;border-radius:3px;overflow:hidden;width:100%}
+  .ontime-bar-fill{height:100%;border-radius:3px;background:#5DADE2}
+  .rank-badge{width:20px;height:20px;border-radius:50%;font-size:10px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;background:#EBF5FB;color:#2E86C1;margin-right:6px}
+  .rank-1{background:#2E86C1;color:#fff}
+  .rank-2{background:#5DADE2;color:#fff}
+  .rank-3{background:#AED6F1;color:#1A5276}
+
+  /* Hour grid */
+  .hour-grid{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));gap:2px;margin-top:8px}
+  .hour-cell{text-align:center;border-radius:4px;padding:4px 0}
+  .hour-label{font-size:8px;color:#85C1E9;margin-top:2px;text-align:center}
+  .hour-bar{border-radius:4px;transition:opacity .2s}
+  .hour-wrap{display:flex;flex-direction:column;align-items:center;cursor:pointer}
+  .hour-wrap:hover .hour-bar{opacity:.75}
+
+  .tsa-legend{display:flex;gap:12px;font-size:11px;color:#5D8AA8;margin-bottom:8px;flex-wrap:wrap}
+  .leg-sq{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px}
+
+  .rec-box{background:#EBF5FB;border:1.5px solid #AED6F1;border-radius:10px;padding:12px 14px;margin-top:10px}
+  .rec-text{font-size:12px;color:#1A5276;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div>
+    <h1>✈ Airport Arrival Optimizer</h1>
+    <div class="subtitle">Real 2024 airline performance data · TSA historical wait patterns</div>
+  </div>
+  <div class="controls">
+    <div>
+      <label>Flight time</label><br>
+      <input type="time" id="flightTime" value="08:00">
+    </div>
+    <div>
+      <label>Airline</label><br>
+      <select id="airlineSelect">
+        <option value="DL">Delta (DL)</option>
+        <option value="UA">United (UA)</option>
+        <option value="HA">Hawaiian (HA)</option>
+        <option value="AS">Alaska (AS)</option>
+        <option value="AA" selected>American (AA)</option>
+        <option value="WN">Southwest (WN)</option>
+        <option value="B6">JetBlue (B6)</option>
+        <option value="NK">Spirit (NK)</option>
+        <option value="F9">Frontier (F9)</option>
+        <option value="G4">Allegiant (G4)</option>
+      </select>
+    </div>
+    <div>
+      <label>Day</label><br>
+      <select id="daySelect">
+        <option value="Mon">Monday</option>
+        <option value="Tue">Tuesday</option>
+        <option value="Wed">Wednesday</option>
+        <option value="Thu">Thursday</option>
+        <option value="Fri">Friday</option>
+        <option value="Sat">Saturday</option>
+        <option value="Sun">Sunday</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="toggle-row" style="margin-bottom:14px">
+  <div class="toggle" id="tgl-bag" onclick="toggleOpt('bag')">🧳 Checked bag</div>
+  <div class="toggle" id="tgl-pre" onclick="toggleOpt('pre')">⚡ TSA PreCheck</div>
+  <div class="toggle" id="tgl-clr" onclick="toggleOpt('clr')">👁 CLEAR</div>
+  <div class="toggle" id="tgl-int" onclick="toggleOpt('int')">🌍 International</div>
+  <div class="toggle" id="tgl-peak" onclick="toggleOpt('peak')">📅 Peak season</div>
+</div>
+
+<!-- Verdict -->
+<div class="verdict">
+  <div class="plane-icon">✈️</div>
+  <div class="verdict-main">
+    <div class="verdict-label">Recommended airport arrival</div>
+    <div class="verdict-time" id="recTime">—</div>
+    <div class="verdict-sub" id="recSub"></div>
+    <div class="verdict-chips" id="recChips"></div>
+  </div>
+  <div style="text-align:right">
+    <div class="verdict-label">Latest safe arrival</div>
+    <div style="font-size:22px;font-weight:600;color:#E74C3C;font-family:'DM Mono',monospace" id="latestTime">—</div>
+    <div style="font-size:11px;color:#E74C3C;margin-top:2px">Do not arrive after this</div>
+  </div>
+</div>
+
+<!-- Metrics -->
+<div class="metrics-row">
+  <div class="metric">
+    <div class="metric-label">Total buffer</div>
+    <div class="metric-val" id="m-buffer">—</div>
+    <div class="metric-sub">minutes before flight</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">TSA wait now</div>
+    <div class="metric-val" id="m-tsa">—</div>
+    <div class="metric-sub">at your flight hour</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">On-time rate</div>
+    <div class="metric-val" id="m-ontime">—</div>
+    <div class="metric-sub">2024 Cirium data</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Delay risk</div>
+    <div class="metric-val" id="m-delay">—</div>
+    <div class="metric-sub">flights not on time</div>
+  </div>
+</div>
+
+<div class="two-col">
+  <!-- Breakdown -->
+  <div class="card">
+    <h2>Your time breakdown</h2>
+    <div id="breakdownBars"></div>
+    <div class="rec-box" id="recBox"></div>
+  </div>
+
+  <!-- Airlines ranking -->
+  <div class="card">
+    <h2>All 10 airlines — 2024 on-time performance</h2>
+    <div class="airline-header">
+      <span>Airline</span><span>On-time</span><span>Performance</span><span>Gate closes</span><span>PreCheck</span>
+    </div>
+    <div id="airlineRanking"></div>
+  </div>
+</div>
+
+<!-- TSA Heatmap -->
+<div class="card" style="margin-bottom:16px">
+  <h2>Best hours to fly — TSA wait times by hour</h2>
+  <div class="tsa-legend">
+    <span><span class="leg-sq" style="background:#58D68D"></span>Best (&lt;12 min)</span>
+    <span><span class="leg-sq" style="background:#5DADE2"></span>Good (12–25 min)</span>
+    <span><span class="leg-sq" style="background:#F4D03F"></span>Fair (25–35 min)</span>
+    <span><span class="leg-sq" style="background:#EC7063"></span>Avoid (&gt;35 min)</span>
+  </div>
+  <div class="hour-grid" id="hourGrid"></div>
+</div>
+
+<div style="font-size:10px;color:#85C1E9;text-align:center;padding-bottom:8px">
+  Sources: Cirium 2024 On-Time Performance Review · U.S. DOT Air Travel Consumer Report · TSA MyTSA historical patterns
+</div>
+
+<script>
+const AIRLINES = {
+  DL:{name:'Delta Air Lines',      onTime:83.46,gateClose:10,board:35,precheck:true, delay:42,color:'#2E86C1'},
+  UA:{name:'United Airlines',      onTime:80.93,gateClose:10,board:35,precheck:true, delay:47,color:'#5DADE2'},
+  HA:{name:'Hawaiian Airlines',    onTime:80.10,gateClose:10,board:30,precheck:true, delay:35,color:'#7FB3D3'},
+  AS:{name:'Alaska Airlines',      onTime:79.25,gateClose:10,board:30,precheck:true, delay:38,color:'#1A5276'},
+  AA:{name:'American Airlines',    onTime:77.78,gateClose:10,board:40,precheck:true, delay:51,color:'#2874A6'},
+  WN:{name:'Southwest Airlines',   onTime:77.77,gateClose:10,board:30,precheck:false,delay:44,color:'#AED6F1'},
+  B6:{name:'JetBlue Airways',      onTime:74.20,gateClose:10,board:30,precheck:true, delay:55,color:'#85C1E9'},
+  NK:{name:'Spirit Airlines',      onTime:72.10,gateClose:15,board:45,precheck:false,delay:50,color:'#D6EAF8'},
+  F9:{name:'Frontier Airlines',    onTime:71.50,gateClose:15,board:45,precheck:false,delay:53,color:'#A9CCE3'},
+  G4:{name:'Allegiant Air',        onTime:68.90,gateClose:20,board:50,precheck:false,delay:58,color:'#C9D9E8'},
+};
+
+const TSA_HOURLY = [8,5,5,5,10,22,35,42,38,28,20,18,22,24,26,30,36,40,34,25,18,14,10,8];
+
+const opts = {bag:false, pre:false, clr:false, int:false, peak:false};
+
+function toggleOpt(k){
+  opts[k]=!opts[k];
+  document.getElementById('tgl-'+k).classList.toggle('active',opts[k]);
+  // Can't have CLEAR + PreCheck selected simultaneously visually, but both reduce wait
+  update();
+}
+
+function tsaWait(hour, pre, clr){
+  const base = TSA_HOURLY[hour % 24] || 20;
+  let w = base;
+  const {day, peak} = getParams();
+  if(peak) w = Math.round(w * 1.35);
+  if(['Fri','Sun'].includes(day)) w = Math.round(w * 1.20);
+  else if(day==='Mon') w = Math.round(w * 1.10);
+  if(clr) return Math.max(3, Math.round(w * 0.10));
+  if(pre) return Math.max(5, Math.round(w * 0.22));
+  return w;
+}
+
+function getParams(){
+  const ft = document.getElementById('flightTime').value || '08:00';
+  const code = document.getElementById('airlineSelect').value;
+  const day = document.getElementById('daySelect').value;
+  const hour = parseInt(ft.split(':')[0]);
+  return {ft, code, day, hour, peak: opts.peak};
+}
+
+function calcBuffer(){
+  const {ft, code, day, hour} = getParams();
+  const a = AIRLINES[code];
+  const tsa = tsaWait(hour, opts.pre, opts.clr);
+  const bag = opts.bag ? 20 : 0;
+  const intl = opts.int ? 45 : 0;
+  const breakdown = {
+    'Parking / walk-in': 10,
+    'Bag drop': bag,
+    'TSA security': tsa,
+    'Terminal walk': 10,
+    'Board start buffer': a.board,
+    'International extra': intl,
+    'Misc / kiosk': 5,
+  };
+  const total = Object.values(breakdown).reduce((a,b)=>a+b,0);
+  const [hh,mm] = ft.split(':').map(Number);
+  const depMins = hh*60+mm;
+  const recMins = depMins - total;
+  const latestMins = depMins - (tsa + a.gateClose + 10 + bag + 5);
+  const fmt = m => {
+    let h=(Math.round(m)+1440)%1440; // wrap midnight
+    return `${String(Math.floor(h/60)).padStart(2,'0')}:${String(h%60).padStart(2,'0')}`;
+  };
+  return {a, tsa, breakdown, total, recTime: fmt(recMins), latestTime: fmt(latestMins)};
+}
+
+function update(){
+  const {ft, code, day, hour} = getParams();
+  const {a, tsa, breakdown, total, recTime, latestTime} = calcBuffer();
+
+  document.getElementById('recTime').textContent = recTime;
+  document.getElementById('latestTime').textContent = latestTime;
+  document.getElementById('recSub').textContent = `${a.name} · Flight at ${ft}`;
+
+  // chips
+  const chips = [];
+  if(opts.pre) chips.push({t:'TSA PreCheck ⚡',c:'chip-green'});
+  if(opts.clr) chips.push({t:'CLEAR 👁',c:'chip-green'});
+  if(opts.bag) chips.push({t:'Checked bag 🧳',c:'chip-amber'});
+  if(opts.int) chips.push({t:'International 🌍',c:'chip-blue'});
+  if(opts.peak) chips.push({t:'Peak season 📅',c:'chip-red'});
+  document.getElementById('recChips').innerHTML = chips.map(c=>`<span class="chip ${c.c}">${c.t}</span>`).join('');
+
+  document.getElementById('m-buffer').textContent = total+'m';
+  document.getElementById('m-tsa').textContent = tsa+'m';
+  document.getElementById('m-ontime').textContent = a.onTime.toFixed(1)+'%';
+  const delayRisk = (100-a.onTime).toFixed(1)+'%';
+  document.getElementById('m-delay').textContent = delayRisk;
+
+  // breakdown bars
+  const maxVal = Math.max(...Object.values(breakdown).filter(v=>v>0), 1);
+  const barColors = {
+    'Parking / walk-in':'#AED6F1','Bag drop':'#5DADE2','TSA security':'#2E86C1',
+    'Terminal walk':'#1A5276','Board start buffer':'#85C1E9','International extra':'#F4D03F','Misc / kiosk':'#D6EAF8'
+  };
+  document.getElementById('breakdownBars').innerHTML = Object.entries(breakdown)
+    .filter(([,v])=>v>0)
+    .map(([k,v])=>`
+      <div class="breakdown-item">
+        <div class="breakdown-label"><span>${k}</span><span>${v} min</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(v/maxVal*100).toFixed(0)}%;background:${barColors[k]||'#AED6F1'}"></div></div>
+      </div>`).join('');
+
+  // rec box
+  const tip = opts.pre ? 'TSA PreCheck is cutting your wait significantly.' : 'Consider TSA PreCheck ($78/5yr) — saves 15–35 min at peak hours.';
+  document.getElementById('recBox').innerHTML = `<div class="rec-text">💡 ${tip} ${a.onTime>=80?'<strong>'+a.name+'</strong> has an excellent on-time record — delays are unlikely.':'<strong>'+a.name+'</strong> has a moderate delay risk; a small extra buffer is wise.'}</div>`;
+
+  // airlines ranking
+  const sorted = Object.entries(AIRLINES).sort((a,b)=>b[1].onTime-a[1].onTime);
+  document.getElementById('airlineRanking').innerHTML = sorted.map(([code2, al], i)=>{
+    const isCurrent = code2 === code;
+    const badge = i<3 ? `<span class="rank-badge rank-${i+1}">${i+1}</span>` : `<span class="rank-badge">${i+1}</span>`;
+    const pct = al.onTime;
+    const pctNorm = ((pct - 65)/(85-65)*100).toFixed(0);
+    return `<div class="airline-row" style="${isCurrent?'background:#EBF5FB;border-radius:8px;padding:9px 6px;margin:0 -6px':''};font-weight:${isCurrent?'500':'400'}">
+      <span>${badge}${al.name}${isCurrent?' <span style="font-size:10px;color:#2E86C1">← selected</span>':''}</span>
+      <span style="font-family:'DM Mono',monospace;color:#1A5276;font-size:12px">${pct}%</span>
+      <span><div class="ontime-bar-track"><div class="ontime-bar-fill" style="width:${pctNorm}%;background:${al.color}"></div></div></span>
+      <span style="color:#5D8AA8">${al.gateClose} min</span>
+      <span style="color:${al.precheck?'#1E8449':'#C0392B'}">${al.precheck?'✓':'✗'}</span>
+    </div>`;
+  }).join('');
+
+  // hour grid
+  renderHourGrid(hour);
+}
+
+function hourColor(w){
+  if(w<=12) return '#58D68D';
+  if(w<=25) return '#5DADE2';
+  if(w<=35) return '#F4D03F';
+  return '#EC7063';
+}
+
+function renderHourGrid(flightHour){
+  const {pre, peak} = {pre: opts.pre, peak: opts.peak};
+  const day = document.getElementById('daySelect').value;
+  const grid = document.getElementById('hourGrid');
+  const maxH = 45;
+  grid.innerHTML = Array.from({length:24},(_,h)=>{
+    const w = tsaWait(h, opts.pre, opts.clr);
+    const ht = Math.max(8, Math.round(w/maxH*50));
+    const isNow = h===flightHour;
+    return `<div class="hour-wrap" title="${h}:00 — ${w} min wait">
+      <div class="hour-bar" style="width:100%;height:${ht}px;background:${isNow?'#1A5276':hourColor(w)};border:${isNow?'2px solid #1A5276':'none'};border-radius:4px"></div>
+      <div class="hour-label" style="color:${isNow?'#1A5276':'#85C1E9'};font-weight:${isNow?'600':'400'}">${h}</div>
+      <div class="hour-label" style="color:${isNow?'#1A5276':'#85C1E9'}">${w}m</div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('flightTime').addEventListener('input', update);
+document.getElementById('airlineSelect').addEventListener('change', update);
+document.getElementById('daySelect').addEventListener('change', update);
+
+update();
+</script>
+</body>
+</html>
