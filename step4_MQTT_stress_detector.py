@@ -1,7 +1,4 @@
-# ============================================================
-# APAN 5570 – Assignment 3 (Yaritza & Felice Version)
-# Core2 Stress Signal Detector (Upload Mode + MQTT)
-# ============================================================
+# Core2 Stress Signal Detector
 # Phases 1-3 run ONCE on boot:
 #   Phase 1 - File verification  (checks /flash/ for files)
 #   Phase 2 - WiFi connection    (connects once, halts on fail)
@@ -44,15 +41,11 @@ import struct
 import math
 
 # ----------------------------------------------------------
-# WiFi + MQTT Configuration  -- CHANGE THESE!
+# WiFi-- CHANGE THESE!
 # ----------------------------------------------------------
 WIFI_SSID      = "YourWiFi"       # Same WiFi as your computer
 WIFI_PASSWORD  = "YourPassword"
 BROKER_IP      = "192.168.0.88"   #computer's local IP
-
-MQTT_CLIENT_ID = "core2_stress"
-MQTT_TOPIC     = b"apan5570/core2/stress"
-MQTT_PORT      = 1883
 
 # ----------------------------------------------------------
 # Stress detector configuration
