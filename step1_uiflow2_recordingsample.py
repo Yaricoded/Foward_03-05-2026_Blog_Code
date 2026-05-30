@@ -1,7 +1,5 @@
 # ============================================================
-# APAN 5570 – Assignment 3 (Yaritza & Felice Version)
 # Core2 Stress Signal Recorder + Detector
-# ============================================================
 # Records SIX 5-second audio/motion clips:
 #
 # SOUND-BASED (audio via SPM1423 PDM mic):
@@ -59,7 +57,6 @@ DETECT_AUDIO_BUF        = SAMPLE_RATE * DETECT_AUDIO_DURATION * BYTES_PER_SAMPLE
 
 # ----------------------------------------------------------
 # WAV header builder
-# ----------------------------------------------------------
 def make_wav_header(sample_rate, bits_per_sample, num_channels, data_size):
     byte_rate   = sample_rate * num_channels * (bits_per_sample // 8)
     block_align = num_channels * (bits_per_sample // 8)
@@ -74,7 +71,6 @@ def make_wav_header(sample_rate, bits_per_sample, num_channels, data_size):
 
 # ----------------------------------------------------------
 # Initialize hardware
-# ----------------------------------------------------------
 M5.begin()
 Widgets.fillScreen(0x000000)
 
@@ -85,7 +81,6 @@ Speaker.end()
 
 # ----------------------------------------------------------
 # Display helper
-# ----------------------------------------------------------
 def show(line1, line2='', color=0xFFFFFF, bg=0x000000):
     Widgets.fillScreen(bg)
     Widgets.Label(line1, 10, 60,  1.0, color,    bg, Widgets.FONTS.DejaVu24)
@@ -95,7 +90,6 @@ def show(line1, line2='', color=0xFFFFFF, bg=0x000000):
 
 # ----------------------------------------------------------
 # Countdown helper
-# ----------------------------------------------------------
 def countdown(label, seconds=3):
     for i in range(seconds, 0, -1):
         show(f'{label}', f'Starting in {i}...', 0xFFFF00)
@@ -104,7 +98,6 @@ def countdown(label, seconds=3):
 # ----------------------------------------------------------
 # AUDIO RECORDING
 # Records DURATION seconds and saves as WAV to /flash/
-# ----------------------------------------------------------
 def record_audio(filename, prompt_line1, prompt_line2=''):
     """Show prompt, countdown, record audio, save WAV."""
     show(prompt_line1, prompt_line2, 0x00CCFF)
@@ -134,7 +127,6 @@ def record_audio(filename, prompt_line1, prompt_line2=''):
 # MOTION RECORDING
 # Polls MPU6886 at IMU_RATE for DURATION seconds,
 # saves ax,ay,az,gx,gy,gz columns to CSV in /flash/
-# ----------------------------------------------------------
 def record_motion(filename, prompt_line1, prompt_line2=''):
     """Show prompt, countdown, record IMU data, save CSV."""
     show(prompt_line1, prompt_line2, 0xCC88FF)
@@ -167,7 +159,6 @@ def record_motion(filename, prompt_line1, prompt_line2=''):
 
 # ----------------------------------------------------------
 # RMS energy of 16-bit signed PCM buffer
-# ----------------------------------------------------------
 def rms_energy(buf):
     n      = len(buf) // 2
     total  = 0
@@ -179,7 +170,6 @@ def rms_energy(buf):
 # ----------------------------------------------------------
 # Live IMU motion magnitude
 # Returns variance of accel magnitude over a short burst
-# ----------------------------------------------------------
 def motion_variance(n_samples=25):
     mags = []
     for _ in range(n_samples):
@@ -194,7 +184,6 @@ def motion_variance(n_samples=25):
 # ----------------------------------------------------------
 # DETECTION DISPLAY
 # Shows stress level based on audio energy + motion variance
-# ----------------------------------------------------------
 LEVEL_COLORS = {
     0: (0x002200, 0x00FF00, 'No stress detected', 'Continue'),
     1: (0x221100, 0xFFAA00, 'Stress Level 1',     'Signs of fatigue'),
@@ -216,7 +205,6 @@ def show_stress_level(level):
 
 # ===========================================================
 # PHASE 1: RECORDING
-# ===========================================================
 #this records 7 sounds/motions
 
 show('STRESS RECORDER', 'Yaritza & Felice', 0x00CCFF)
@@ -302,7 +290,6 @@ time.sleep(5)
 
 # ===========================================================
 # PHASE 2: LIVE DETECTION LOOP
-# ===========================================================
 # Stress level logic (levels 0-3 in order):
 #   No sound, no motion  → Level 0 (baseline, no stress)
 #   Sound only           → Level 1 (signs of fatigue)
@@ -312,7 +299,6 @@ time.sleep(5)
 # Audio energy and motion variance are sampled each cycle.
 # Thresholds can be tuned after reviewing your recordings
 # in the Jupyter notebook (compare RMS / variance values).
-# ===========================================================
 
 show('DETECTION MODE', 'Monitoring stress...', 0x00CCFF)
 time.sleep(1)
