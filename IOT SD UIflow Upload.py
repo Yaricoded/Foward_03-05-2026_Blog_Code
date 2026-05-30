@@ -45,11 +45,11 @@ import math
 # ----------------------------------------------------------
 WIFI_SSID      = "YourWiFi"       # Same WiFi as your computer
 WIFI_PASSWORD  = "YourPassword"
-BROKER_IP      = "192.168.0.88"   #computer's local IP
-
+BROKER_IP      = ""   #computer's local IP
+#apply mqqt here 
 # ----------------------------------------------------------
 # Stress detector configuration
-# ----------------------------------------------------------
+#
 SAMPLE_RATE      = 8000
 BITS_PER_SAMPLE  = 16
 NUM_CHANNELS     = 1
@@ -70,7 +70,7 @@ ALL_FILES    = AUDIO_FILES + MOTION_FILES
 
 # ----------------------------------------------------------
 # Initialize hardware (once at boot)
-# ----------------------------------------------------------
+
 M5.begin()
 Widgets.fillScreen(0x000000)
 
@@ -80,7 +80,7 @@ Speaker.end()
 
 # ----------------------------------------------------------
 # Helpers
-# ----------------------------------------------------------
+
 def show(line1, line2='', color=0xFFFFFF, bg=0x000000):
     Widgets.fillScreen(bg)
     Widgets.Label(line1, 10, 60,  1.0, color,    bg, Widgets.FONTS.DejaVu24)
@@ -166,7 +166,7 @@ time.sleep(2)
 
 # ===========================================================
 # PHASE 2: WiFi CONNECTION  (runs once)
-# ===========================================================
+
 show('Connecting WiFi...', WIFI_SSID, 0xFFFF00)
 time.sleep(2)
 
@@ -191,7 +191,7 @@ time.sleep(2)
 
 # ===========================================================
 # PHASE 3: MQTT CONNECTION  (runs once)
-# ===========================================================
+
 show('Connecting MQTT...', BROKER_IP, 0xFFAA00)
 try:
     mqtt_client = MQTTClient(MQTT_CLIENT_ID, BROKER_IP, MQTT_PORT)
