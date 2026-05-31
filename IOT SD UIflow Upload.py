@@ -43,8 +43,8 @@ import math
 # ----------------------------------------------------------
 # WiFi-- CHANGE THESE!
 # ----------------------------------------------------------
-WIFI_SSID      = "YourWiFi"       # Same WiFi as your computer
-WIFI_PASSWORD  = "YourPassword"
+WIFI_SSID      = ""       #wifi name
+WIFI_PASSWORD  = "" #wifi password
 BROKER_IP      = ""   #computer's local IP
 #apply mqqt here 
 # ----------------------------------------------------------
@@ -124,7 +124,6 @@ def show_stress_level(level):
 
 # ===========================================================
 # PHASE 1: FILE VERIFICATION  (runs once)
-# ===========================================================
 show('STRESS DETECTOR', 'Yaritza & Felice', 0x00CCFF)
 time.sleep(2)
 
@@ -212,7 +211,6 @@ time.sleep(2)
 # If MQTT drops, one reconnect is attempted in-place so the
 # loop never stops -- display keeps updating even if the
 # broker is temporarily unreachable.
-# ===========================================================
 
 show('DETECTION MODE', 'Live monitoring...', 0x00CCFF)
 time.sleep(1)
