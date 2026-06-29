@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Your Closet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --b0:#FDFCFA; --b1:#F4EFE4; --b2:#EDE5D5; --b3:#D8CEBC;
+  --ink:#111110; --ink2:#3D3B35; --ink3:#7A776E; --ink4:#ABA89F;
+  --hr:rgba(17,17,16,.13); --hr2:rgba(17,17,16,.22);
+  --warn:#8C5A3C; --warn-bg:#F3E6DC; --bad:#8C3C3C; --bad-bg:#F3DCDC;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--b1);color:var(--ink);font-family:'Montserrat',sans-serif;font-weight:300;line-height:1.75;min-height:100vh}
+img{display:block;max-width:100%}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+a{color:inherit;text-decoration:none}
+input,select{font-family:inherit}
+
+.wrap{max-width:920px;margin:0 auto;padding:0 28px 100px}
+
+.mast{padding:48px 0 0}
+.mast-eye{font-size:9px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--ink3);margin-bottom:10px}
+.mast-title{font-family:'Cormorant Garamond',serif;font-size:50px;font-style:italic;font-weight:300;line-height:1;letter-spacing:-.5px}
+.mast-rule{width:100%;height:1px;background:var(--ink);margin:18px 0 14px}
+.mast-sub{font-size:10.5px;font-weight:300;color:var(--ink3);line-height:1.8;max-width:560px;margin-bottom:24px}
+
+/* NOTIFICATIONS */
+.banner-stack{margin-bottom:18px;display:flex;flex-direction:column;gap:2px}
+.banner{padding:12px 16px;border:1px solid var(--hr2);background:var(--b0);font-size:11.5px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.banner.due_soon{border-color:var(--warn);background:var(--warn-bg);color:var(--warn)}
+.banner.overdue{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+.btn-mark-returned{font-size:8.5px;font-weight:600;letter-spacing:1.3px;text-transform:uppercase;padding:6px 12px;border:1px solid currentColor;white-space:nowrap}
+
+.tabs{display:flex;border:1px solid var(--hr2);margin-bottom:26px;flex-wrap:wrap}
+.tab{flex:1;min-width:96px;padding:13px 8px;text-align:center;font-size:8.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);border-right:1px solid var(--hr2);transition:background .2s,color .2s}
+.tab:last-child{border-right:none}
+.tab.active{background:var(--ink);color:var(--b1)}
+.tab:hover:not(.active){background:var(--b0)}
+
+.panel{display:none}
+.panel.active{display:block}
+.section-lbl{font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+
+/* upload */
+.upload-form{background:var(--b0);border:1px solid var(--hr2);padding:24px;margin-bottom:24px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-field label{display:block;font-size:8.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ink4);margin-bottom:6px}
+.form-field input[type=text],.form-field input[type=date],.form-field select{width:100%;padding:10px 12px;border:1px solid var(--hr2);background:var(--b1);font-size:12px;color:var(--ink);outline:none}
+.drop-zone{position:relative;border:1px dashed var(--hr2);background:var(--b1);padding:34px 20px;text-align:center;cursor:pointer;margin-bottom:16px}
+.drop-zone:hover,.drop-zone.over{border-color:var(--ink);background:var(--b2)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-head{font-family:'Cormorant Garamond',serif;font-size:16px}
+.drop-foot{font-size:9px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink3);margin-top:3px}
+.upload-preview{display:none;align-items:center;gap:14px;margin-bottom:16px}
+.upload-preview img{width:60px;height:60px;object-fit:cover;border:1px solid var(--hr2)}
+.upload-preview-clear{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);text-decoration:underline}
+.btn-primary{width:100%;padding:13px;background:var(--ink);color:var(--b1);font-size:9px;font-weight:600;letter-spacing:3px;text-transform:uppercase;border:1px solid var(--ink);transition:background .2s}
+.btn-primary:hover:not(:disabled){background:var(--ink2)}
+.btn-primary:disabled{opacity:.3;cursor:not-allowed}
+
+/* closet grid */
+.closet-meta{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+.closet-count{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink4)}
+.closet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:2px}
+.closet-card{background:var(--b0);border:1px solid var(--hr);position:relative}
+.closet-card-img{aspect-ratio:1/1;overflow:hidden;background:var(--b2)}
+.closet-card-img img{width:100%;height:100%;object-fit:cover}
+.closet-card-body{padding:9px 11px}
+.closet-card-cat{font-size:7.5px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink4)}
+.closet-card-name{font-family:'Cormorant Garamond',serif;font-size:12.5px;color:var(--ink);margin-top:1px}
+.closet-card-swatch{position:absolute;top:8px;right:8px;width:13px;height:13px;border:1px solid rgba(255,255,255,.7);border-radius:50%}
+.closet-card-del{position:absolute;top:8px;left:8px;width:19px;height:19px;background:rgba(17,17,16,.55);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;opacity:0;transition:opacity .15s}
+.closet-card:hover .closet-card-del{opacity:1}
+.empty-state{padding:40px 0;text-align:center}
+.empty-state p{font-size:11px;color:var(--ink4);line-height:1.7}
+
+/* profiles */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:24px}
+.profile-card{background:var(--b0);border:1px solid var(--hr2);padding:16px 18px}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;font-weight:400;margin-bottom:4px}
+.profile-desc{font-size:10px;font-weight:300;color:var(--ink3);line-height:1.6;margin-bottom:10px}
+.profile-swatches{display:flex;gap:4px}
+.profile-swatch{width:16px;height:16px;border:1px solid var(--hr2)}
+.custom-profile-form{background:var(--b0);border:1px solid var(--hr2);padding:18px;margin-bottom:24px}
+.custom-profile-form summary{font-size:9px;font-weight:600;letter-spacing:2.2px;text-transform:uppercase;color:var(--ink3);cursor:pointer;list-style:none}
+.custom-profile-form summary::-webkit-details-marker{display:none}
+.custom-profile-form summary::before{content:'+ ';font-weight:600}
+.custom-profile-form[open] summary::before{content:'\2212 '}
+.custom-fields{margin-top:14px}
+.palette-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.palette-swatch-input input[type=color]{width:34px;height:34px;border:1px solid var(--hr2);cursor:pointer;padding:0}
+
+/* suggestions */
+.suggest-controls{display:flex;gap:10px;align-items:center;margin-bottom:22px;flex-wrap:wrap}
+.suggest-controls select{padding:11px 14px;border:1px solid var(--hr2);background:var(--b0);font-size:11px;color:var(--ink);outline:none}
+.btn-suggest{padding:11px 24px;background:var(--ink);color:var(--b1);font-size:9px;font-weight:600;letter-spacing:2.2px;text-transform:uppercase;border:1px solid var(--ink)}
+.outfit-list{display:flex;flex-direction:column;gap:2px}
+.outfit-card{background:var(--b0);border:1px solid var(--hr2);padding:16px 18px}
+.outfit-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;padding-bottom:9px;border-bottom:1px solid var(--hr);flex-wrap:wrap;gap:8px}
+.outfit-score{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
+.outfit-score-bar{width:60px;height:2px;background:var(--b3);margin-left:7px;display:inline-block;vertical-align:middle}
+.outfit-score-fill{height:100%;background:var(--ink)}
+.outfit-items{display:flex;gap:9px;flex-wrap:wrap}
+.outfit-item{width:72px;text-align:center}
+.outfit-item-img{width:72px;height:72px;object-fit:cover;border:1px solid var(--hr2);margin-bottom:5px}
+.outfit-item-name{font-size:8.5px;color:var(--ink2);line-height:1.3}
+.btn-save-outfit{font-size:8.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:7px 14px;border:1px solid var(--hr2);color:var(--ink2)}
+.btn-save-outfit:hover{border-color:var(--ink)}
+
+/* friends */
+.friend-add-row{display:flex;gap:8px;margin-bottom:18px}
+.friend-add-row input{flex:1;padding:11px 13px;border:1px solid var(--hr2);background:var(--b0);font-size:12px;outline:none}
+.btn-add-friend{padding:11px 20px;background:var(--ink);color:var(--b1);font-size:9px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;border:1px solid var(--ink)}
+.friend-list-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--b0);border:1px solid var(--hr);margin-bottom:2px;font-size:11.5px;color:var(--ink2)}
+.friend-list-item strong{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:var(--ink)}
+.btn-del-friend{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink4);text-decoration:underline}
+
+/* log a loan */
+.loan-form{background:var(--b0);border:1px solid var(--hr2);padding:20px;margin-bottom:24px}
+.direction-toggle{display:flex;border:1px solid var(--hr2);margin-bottom:16px}
+.direction-btn{flex:1;padding:10px;text-align:center;font-size:9px;font-weight:600;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink3);border-right:1px solid var(--hr2)}
+.direction-btn:last-child{border-right:none}
+.direction-btn.active{background:var(--ink);color:var(--b1)}
+
+/* loans panel */
+.loan-section-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:18px;margin:24px 0 12px}
+.loan-section-title:first-child{margin-top:0}
+.loan-card{display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--b0);border:1px solid var(--hr2);margin-bottom:2px}
+.loan-card img{width:50px;height:50px;object-fit:cover;border:1px solid var(--hr2)}
+.loan-card-noimg{width:50px;height:50px;background:var(--b2);border:1px solid var(--hr2)}
+.loan-info{flex:1;font-size:11.5px;color:var(--ink2)}
+.loan-info strong{color:var(--ink)}
+.loan-due{font-size:9.5px;letter-spacing:.5px;color:var(--ink3);margin-top:2px}
+.loan-due.due_soon{color:var(--warn);font-weight:600}
+.loan-due.overdue{color:var(--bad);font-weight:600}
+.loan-actions{display:flex;gap:6px}
+.btn-mark-returned-inline{font-size:8px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;padding:7px 12px;border:1px solid var(--hr2)}
+.btn-mark-returned-inline:hover{border-color:var(--ink)}
+.btn-del-loan{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ink4);text-decoration:underline}
+
+.err-box{margin-top:14px;padding:13px 16px;border:1px solid var(--hr2);background:var(--b0);font-size:12px;color:var(--ink3);line-height:1.7}
+.footer{margin-top:56px;padding:20px 0;border-top:1px solid var(--hr);display:flex;align-items:center;justify-content:space-between}
+.footer-mark{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;font-weight:300;color:var(--ink3)}
+.footer-note{font-size:8.5px;font-weight:300;letter-spacing:1px;color:var(--ink4)}
+
+@media(max-width:600px){
+  .mast-title{font-size:36px}
+  .form-row,.profile-grid{grid-template-columns:1fr}
+  .tab{font-size:7.5px;letter-spacing:1px;padding:10px 4px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <p class="mast-eye">Personal Styling</p>
+    <h1 class="mast-title">Your Closet</h1>
+    <div class="mast-rule"></div>
+    <p class="mast-sub">Upload your wardrobe, get outfit pairings, and keep track of pieces you've borrowed from or lent to friends — with in-app reminders when something's due back. No login, no external accounts — this is just your closet.</p>
+  </header>
+
+  <div class="banner-stack" id="banner-stack"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-panel="upload">Add Item</button>
+    <button class="tab" data-panel="closet">My Closet</button>
+    <button class="tab" data-panel="profiles">Profiles</button>
+    <button class="tab" data-panel="suggest">Suggestions</button>
+    <button class="tab" data-panel="friends">Friends</button>
+    <button class="tab" data-panel="loans">Borrowed &amp; Lent</button>
+  </div>
+
+  <!-- ADD ITEM -->
+  <section class="panel active" id="panel-upload">
+    <p class="section-lbl">Upload a clothing piece</p>
+    <div class="upload-form">
+      <div class="drop-zone" id="drop-zone" role="button" tabindex="0">
+        <input type="file" id="file-input" accept="image/*"/>
+        <p class="drop-head">Drop a photo here</p>
+        <p class="drop-foot">or click to browse</p>
+      </div>
+      <div class="upload-preview" id="upload-preview">
+        <img id="preview-img" alt="Preview"/>
+        <span class="upload-preview-clear" id="preview-clear">Remove</span>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Item name</label><input type="text" id="item-name" placeholder="e.g. Cream wool blazer"/></div>
+        <div class="form-field"><label>Category</label>
+          <select id="item-category">
+            <option>Top</option><option>Bottom</option><option>Dress</option>
+            <option>Outerwear</option><option>Shoes</option><option>Bag</option><option>Accessory</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field" style="margin-bottom:16px"><label>Notes (optional)</label><input type="text" id="item-notes" placeholder="e.g. linen, thrifted"/></div>
+      <button class="btn-primary" id="btn-upload" disabled>Add to Closet</button>
+    </div>
+    <div id="upload-result"></div>
+  </section>
+
+  <!-- MY CLOSET -->
+  <section class="panel" id="panel-closet">
+    <div class="closet-meta"><p class="section-lbl" style="margin-bottom:0">My Closet</p><span class="closet-count" id="closet-count"></span></div>
+    <div class="closet-grid" id="closet-grid"></div>
+  </section>
+
+  <!-- PROFILES -->
+  <section class="panel" id="panel-profiles">
+    <p class="section-lbl">Choose a style profile</p>
+    <div class="profile-grid" id="profile-grid"></div>
+    <details class="custom-profile-form">
+      <summary>Create your own profile</summary>
+      <div class="custom-fields">
+        <div class="form-row">
+          <div class="form-field"><label>Profile name</label><input type="text" id="cp-name" placeholder="e.g. Signature look"/></div>
+          <div class="form-field"><label>Mood</label><input type="text" id="cp-mood" placeholder="e.g. minimal, romantic"/></div>
+        </div>
+        <div class="form-field" style="margin-bottom:14px"><label>Description</label><input type="text" id="cp-desc" placeholder="Short description"/></div>
+        <label style="display:block;font-size:8.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ink4);margin-bottom:8px">Palette</label>
+        <div class="palette-row" id="palette-row">
+          <div class="palette-swatch-input"><input type="color" value="#F4EFE4"/></div>
+          <div class="palette-swatch-input"><input type="color" value="#FDFCFA"/></div>
+          <div class="palette-swatch-input"><input type="color" value="#111110"/></div>
+          <div class="palette-swatch-input"><input type="color" value="#D8CEBC"/></div>
+          <div class="palette-swatch-input"><input type="color" value="#3D3B35"/></div>
+        </div>
+        <button class="btn-primary" id="btn-create-profile">Save Profile</button>
+      </div>
+    </details>
+  </section>
+
+  <!-- SUGGESTIONS -->
+  <section class="panel" id="panel-suggest">
+    <p class="section-lbl">Get outfit suggestions</p>
+    <div class="suggest-controls">
+      <select id="suggest-profile-select"></select>
+      <button class="btn-suggest" id="btn-suggest">Suggest Outfits</button>
+    </div>
+    <div id="suggest-results"></div>
+  </section>
+
+  <!-- FRIENDS -->
+  <section class="panel" id="panel-friends">
+    <p class="section-lbl">Add a friend</p>
+    <div class="friend-add-row">
+      <input type="text" id="friend-name-input" placeholder="Friend's name"/>
+      <button class="btn-add-friend" id="btn-add-friend">Add</button>
+    </div>
+    <div id="add-friend-result"></div>
+
+    <p class="section-lbl" style="margin-top:24px">Your friends</p>
+    <div id="friend-list"></div>
+  </section>
+
+  <!-- BORROWED & LENT -->
+  <section class="panel" id="panel-loans">
+    <p class="section-lbl">Log a borrow or lend</p>
+    <div class="loan-form">
+      <div class="direction-toggle">
+        <button class="direction-btn active" data-dir="borrowed" id="dir-borrowed">I'm borrowing this</button>
+        <button class="direction-btn" data-dir="lent" id="dir-lent">I'm lending this out</button>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Item</label><select id="loan-item-select"></select></div>
+        <div class="form-field"><label>Friend</label><select id="loan-friend-select"></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Due back</label><input type="date" id="loan-due-date"/></div>
+        <div class="form-field"><label>Notes (optional)</label><input type="text" id="loan-notes" placeholder="e.g. for her birthday dinner"/></div>
+      </div>
+      <button class="btn-primary" id="btn-create-loan">Log It</button>
+    </div>
+    <div id="loan-form-result"></div>
+
+    <p class="loan-section-title">Items you're borrowing</p>
+    <div id="my-borrowed-list"></div>
+    <p class="loan-section-title">Items you've lent out</p>
+    <div id="my-lent-list"></div>
+  </section>
+
+  <footer class="footer">
+    <span class="footer-mark">Your Closet</span>
+    <span class="footer-note">Flask · SQLite · Pillow — no external API required</span>
+  </footer>
+</div>
+
+<script>
+const API_BASE = '';
+function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+async function api(path, options = {}) { const res = await fetch(`${API_BASE}${path}`, options); return res.json(); }
+
+/* ══════════════ INIT ══════════════ */
+loadCloset();
+loadBanners();
+
+/* ══════════════ NOTIFICATIONS ══════════════ */
+async function loadBanners() {
+  const stack = document.getElementById('banner-stack');
+  const notifs = await api('/api/notifications');
+  if (!notifs || !notifs.length) { stack.innerHTML = ''; return; }
+  stack.innerHTML = notifs.map(n => `
+    <div class="banner ${n.status}">
+      <span>${esc(n.message)}</span>
+      <button class="btn-mark-returned" data-id="${n.loan_id}">Mark Returned</button>
+    </div>`).join('');
+  stack.querySelectorAll('.btn-mark-returned').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await api(`/api/loans/${btn.dataset.id}/return`, { method: 'POST' });
+      loadBanners();
+    });
+  });
+}
+
+/* ══════════════ TABS ══════════════ */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(`panel-${tab.dataset.panel}`).classList.add('active');
+    const p = tab.dataset.panel;
+    if (p === 'closet') loadCloset();
+    if (p === 'profiles') loadProfiles();
+    if (p === 'suggest') loadProfilesForSuggest();
+    if (p === 'friends') loadFriends();
+    if (p === 'loans') { loadLoanFormOptions(); loadLoansPanel(); }
+  });
+});
+
+/* ══════════════ ADD ITEM ══════════════ */
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const uploadPreview = document.getElementById('upload-preview');
+const previewImg = document.getElementById('preview-img');
+const previewClear = document.getElementById('preview-clear');
+const btnUpload = document.getElementById('btn-upload');
+let selectedFile = null;
+
+function handleFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    previewImg.src = e.target.result;
+    uploadPreview.style.display = 'flex';
+    dropZone.style.display = 'none';
+    btnUpload.disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('over'); handleFile(e.dataTransfer.files[0]); });
+previewClear.addEventListener('click', () => {
+  selectedFile = null; uploadPreview.style.display = 'none'; dropZone.style.display = 'block';
+  btnUpload.disabled = true; fileInput.value = '';
+});
+
+btnUpload.addEventListener('click', async () => {
+  if (!selectedFile) return;
+  const name = document.getElementById('item-name').value.trim() || 'Untitled item';
+  const category = document.getElementById('item-category').value;
+  const notes = document.getElementById('item-notes').value.trim();
+  const formData = new FormData();
+  formData.append('image', selectedFile); formData.append('name', name);
+  formData.append('category', category); formData.append('notes', notes);
+
+  btnUpload.disabled = true; btnUpload.textContent = 'Adding…';
+  const res = await fetch(`${API_BASE}/api/items`, { method: 'POST', body: formData });
+  const data = await res.json();
+  if (data.error) { document.getElementById('upload-result').innerHTML = `<div class="err-box">${esc(data.error)}</div>`; }
+  else {
+    document.getElementById('upload-result').innerHTML = `<div class="err-box" style="border-color:var(--ink)">Added "${esc(data.name)}" to your closet.</div>`;
+    previewClear.click(); document.getElementById('item-name').value=''; document.getElementById('item-notes').value='';
+  }
+  btnUpload.disabled = false; btnUpload.textContent = 'Add to Closet';
+});
+
+/* ══════════════ MY CLOSET ══════════════ */
+async function loadCloset() {
+  const grid = document.getElementById('closet-grid');
+  const items = await api('/api/items');
+  document.getElementById('closet-count').textContent = `${items.length} pieces`;
+  if (!items.length) { grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>Your closet is empty. Add your first piece from "Add Item".</p></div>`; return; }
+  grid.innerHTML = items.map(it => `
+    <article class="closet-card">
+      <button class="closet-card-del" data-id="${it.id}" aria-label="Delete">✕</button>
+      <div class="closet-card-img"><img src="${API_BASE}/uploads/${esc(it.filename)}" alt="${esc(it.name)}"/></div>
+      <div class="closet-card-swatch" style="background:${esc(it.dominant_color)}"></div>
+      <div class="closet-card-body"><p class="closet-card-cat">${esc(it.category)}</p><p class="closet-card-name">${esc(it.name)}</p></div>
+    </article>`).join('');
+  grid.querySelectorAll('.closet-card-del').forEach(btn => btn.addEventListener('click', async () => { await api(`/api/items/${btn.dataset.id}`, { method:'DELETE' }); loadCloset(); }));
+}
+
+/* ══════════════ PROFILES ══════════════ */
+async function loadProfiles() {
+  const grid = document.getElementById('profile-grid');
+  const profiles = await api('/api/profiles');
+  grid.innerHTML = profiles.map(p => `
+    <div class="profile-card">
+      <p class="profile-name">${esc(p.name)}</p>
+      <p class="profile-desc">${esc(p.description || '')}</p>
+      <div class="profile-swatches">${p.palette.map(c => `<span class="profile-swatch" style="background:${esc(c)}"></span>`).join('')}</div>
+    </div>`).join('');
+}
+
+document.getElementById('btn-create-profile').addEventListener('click', async () => {
+  const name = document.getElementById('cp-name').value.trim();
+  const mood = document.getElementById('cp-mood').value.trim();
+  const description = document.getElementById('cp-desc').value.trim();
+  const palette = Array.from(document.querySelectorAll('#palette-row input[type=color]')).map(i => i.value);
+  if (!name) return alert('Give your profile a name first.');
+  const data = await api('/api/profiles', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name,mood,description,palette}) });
+  if (data.error) { alert(data.error); return; }
+  document.getElementById('cp-name').value=''; document.getElementById('cp-mood').value=''; document.getElementById('cp-desc').value='';
+  loadProfiles();
+});
+
+/* ══════════════ SUGGESTIONS ══════════════ */
+async function loadProfilesForSuggest() {
+  const select = document.getElementById('suggest-profile-select');
+  const profiles = await api('/api/profiles');
+  select.innerHTML = profiles.map(p => `<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');
+}
+
+document.getElementById('btn-suggest').addEventListener('click', async () => {
+  const profile = document.getElementById('suggest-profile-select').value;
+  const results = document.getElementById('suggest-results');
+  results.innerHTML = `<div class="empty-state"><p>Finding your best pairings…</p></div>`;
+  const data = await api(`/api/suggest?profile=${encodeURIComponent(profile)}&limit=6`);
+  if (data.error) { results.innerHTML = `<div class="err-box">${esc(data.error)}</div>`; return; }
+  if (!data.outfits.length) { results.innerHTML = `<div class="empty-state"><p>No combinations found. Add more pieces.</p></div>`; return; }
+  results.innerHTML = `<div class="outfit-list">${data.outfits.map((o, idx) => `
+    <div class="outfit-card">
+      <div class="outfit-card-head">
+        <span class="outfit-score">${o.score}% match <span class="outfit-score-bar"><span class="outfit-score-fill" style="width:${o.score}%"></span></span></span>
+        <button class="btn-save-outfit" data-idx="${idx}" data-profile="${esc(profile)}" data-ids="${o.items.map(i=>i.id).join(',')}">Save outfit</button>
+      </div>
+      <div class="outfit-items">${o.items.map(it => `
+        <div class="outfit-item"><img class="outfit-item-img" src="${API_BASE}/uploads/${esc(it.filename)}" alt="${esc(it.name)}"/><p class="outfit-item-name">${esc(it.name)}</p></div>
+      `).join('')}</div>
+    </div>`).join('')}</div>`;
+
+  results.querySelectorAll('.btn-save-outfit').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const item_ids = btn.dataset.ids.split(',').map(Number);
+      const profile_name = btn.dataset.profile;
+      btn.disabled = true; btn.textContent = 'Saving…';
+      await api('/api/outfits', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ item_ids, profile_name, label: `${profile_name} look` }) });
+      btn.textContent = 'Saved ✓';
+    });
+  });
+});
+
+/* ══════════════ FRIENDS ══════════════ */
+document.getElementById('btn-add-friend').addEventListener('click', async () => {
+  const name = document.getElementById('friend-name-input').value.trim();
+  const box = document.getElementById('add-friend-result');
+  if (!name) return;
+  const data = await api('/api/friends', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name }) });
+  if (data.error) { box.innerHTML = `<div class="err-box">${esc(data.error)}</div>`; return; }
+  box.innerHTML = `<div class="err-box" style="border-color:var(--ink)">Added ${esc(data.name)} to your friends list.</div>`;
+  document.getElementById('friend-name-input').value = '';
+  loadFriends();
+});
+
+async function loadFriends() {
+  const list = document.getElementById('friend-list');
+  const friends = await api('/api/friends');
+  if (!friends.length) { list.innerHTML = `<div class="empty-state"><p>No friends added yet.</p></div>`; return; }
+  list.innerHTML = friends.map(f => `
+    <div class="friend-list-item">
+      <span><strong>${esc(f.name)}</strong></span>
+      <button class="btn-del-friend" data-id="${f.id}">Remove</button>
+    </div>`).join('');
+  list.querySelectorAll('.btn-del-friend').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const data = await api(`/api/friends/${btn.dataset.id}`, { method: 'DELETE' });
+      if (data.error) { alert(data.error); return; }
+      loadFriends();
+    });
+  });
+}
+
+/* ══════════════ LOG A LOAN ══════════════ */
+let currentDirection = 'borrowed';
+document.getElementById('dir-borrowed').addEventListener('click', () => setDirection('borrowed'));
+document.getElementById('dir-lent').addEventListener('click', () => setDirection('lent'));
+function setDirection(dir) {
+  currentDirection = dir;
+  document.getElementById('dir-borrowed').classList.toggle('active', dir === 'borrowed');
+  document.getElementById('dir-lent').classList.toggle('active', dir === 'lent');
+}
+
+async function loadLoanFormOptions() {
+  const [items, friends] = await Promise.all([api('/api/items'), api('/api/friends')]);
+  document.getElementById('loan-item-select').innerHTML = items.map(it => `<option value="${it.id}">${esc(it.name)} (${esc(it.category)})</option>`).join('') || `<option disabled>Add closet items first</option>`;
+  document.getElementById('loan-friend-select').innerHTML = friends.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('') || `<option disabled>Add a friend first</option>`;
+  document.getElementById('loan-due-date').min = new Date().toISOString().split('T')[0];
+}
+
+document.getElementById('btn-create-loan').addEventListener('click', async () => {
+  const item_id = Number(document.getElementById('loan-item-select').value);
+  const friend_id = Number(document.getElementById('loan-friend-select').value);
+  const due_back = document.getElementById('loan-due-date').value;
+  const notes = document.getElementById('loan-notes').value.trim();
+  const resultBox = document.getElementById('loan-form-result');
+
+  if (!item_id || !friend_id || !due_back) { resultBox.innerHTML = `<div class="err-box">Pick an item, a friend, and a due-back date.</div>`; return; }
+
+  const data = await api('/api/loans', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ item_id, friend_id, direction: currentDirection, due_back, notes }) });
+  if (data.error) { resultBox.innerHTML = `<div class="err-box">${esc(data.error)}</div>`; return; }
+  resultBox.innerHTML = `<div class="err-box" style="border-color:var(--ink)">Logged.</div>`;
+  document.getElementById('loan-notes').value = '';
+  loadLoansPanel(); loadBanners();
+});
+
+/* ══════════════ BORROWED & LENT PANEL ══════════════ */
+async function loadLoansPanel() {
+  const borrowedList = document.getElementById('my-borrowed-list');
+  const lentList = document.getElementById('my-lent-list');
+  const [borrowed, lent] = await Promise.all([api('/api/loans?direction=borrowed'), api('/api/loans?direction=lent')]);
+
+  const activeBorrowed = borrowed.filter(l => l.status !== 'returned');
+  const activeLent = lent.filter(l => l.status !== 'returned');
+
+  borrowedList.innerHTML = !activeBorrowed.length
+    ? `<div class="empty-state"><p>You're not borrowing anything right now.</p></div>`
+    : activeBorrowed.map(l => loanCardHtml(l, l.friend_name, 'from')).join('');
+
+  lentList.innerHTML = !activeLent.length
+    ? `<div class="empty-state"><p>You haven't lent anything out right now.</p></div>`
+    : activeLent.map(l => loanCardHtml(l, l.friend_name, 'to')).join('');
+
+  document.querySelectorAll('.btn-mark-returned-inline').forEach(btn => {
+    btn.addEventListener('click', async () => { await api(`/api/loans/${btn.dataset.id}/return`, { method: 'POST' }); loadLoansPanel(); loadBanners(); });
+  });
+  document.querySelectorAll('.btn-del-loan').forEach(btn => {
+    btn.addEventListener('click', async () => { await api(`/api/loans/${btn.dataset.id}`, { method: 'DELETE' }); loadLoansPanel(); loadBanners(); });
+  });
+}
+
+function loanCardHtml(l, otherName, direction) {
+  const dueCls = l.status === 'overdue' ? 'overdue' : (l.status === 'due_soon' ? 'due_soon' : '');
+  const dueText = l.status === 'overdue' ? `Overdue — was due ${esc(l.due_back)}` : `Due back ${esc(l.due_back)}`;
+  const img = l.item_filename
+    ? `<img src="${API_BASE}/uploads/${esc(l.item_filename)}" alt="${esc(l.item_name_snapshot)}"/>`
+    : `<div class="loan-card-noimg"></div>`;
+  return `
+    <div class="loan-card">
+      ${img}
+      <div class="loan-info">
+        <strong>${esc(l.item_name_snapshot)}</strong> ${direction} ${esc(otherName)}
+        <div class="loan-due ${dueCls}">${dueText}</div>
+      </div>
+      <div class="loan-actions">
+        <button class="btn-mark-returned-inline" data-id="${l.id}">Mark Returned</button>
+        <button class="btn-del-loan" data-id="${l.id}">Remove</button>
+      </div>
+    </div>`;
+}
+</script>
+</body>
+</html>
