@@ -1,0 +1,9 @@
+Rank,Company,Sector,Debt/EBITDA (x),EBITDA/Interest (x),EBITDA Margin (%),FFO/Debt (%),Revenue Growth (%),Leverage Score,Coverage Score,Margin Score,FFO/Debt Score,Growth Score,Quant Weighted Score,Business Profile Score,Blended Score,Notching Adj.,Notching Reason,Final Rating,Rating Grade
+1,Delta Tech Corp,Tech / Growth,0.61,24.75,30.0,135.0,15.0,1,1,2,1,2,1.45,3,1.92,0,,Aa,Investment Grade
+2,Alpha Industrials,Industrial,1.71,11.67,25.0,45.0,7.7,2,2,3,2,3,2.3,3,2.51,0,,A,Investment Grade
+3,Granite Materials,Industrial,2.95,7.33,20.0,25.8,4.8,3,3,4,4,4,3.45,4,3.62,0,,Baa,Investment Grade
+4,Cascade Utilities,Utility,3.51,6.61,40.2,21.7,3.0,4,4,1,5,5,3.9,3,3.63,1,"regulated monopoly, strong parent support",Ba,Speculative Grade
+5,Beacon Retail Co.,Industrial,5.38,3.71,10.0,11.8,2.0,6,5,6,6,6,5.75,6,5.82,0,,B,Speculative Grade
+6,Harbor Airlines,Industrial,8.73,2.62,9.0,6.9,8.9,8,6,6,7,3,6.45,6,6.31,1,event risk: pending litigation settlement,Caa,Speculative Grade
+7,Everline Energy,Utility,7.78,2.84,15.0,8.1,-7.7,7,6,5,7,8,6.5,6,6.35,-1,subordinated debt at opco,Ba,Speculative Grade
+8,Foxglove Media,Tech / Growth,14.17,1.09,6.7,0.6,-8.2,9,7,7,8,9,7.95,7,7.66,0,,Ca,Speculative Grade
